@@ -96,8 +96,7 @@ def receive_semaphore_status():
     mode = status.get("mode")
     if mode is None:
         return "No mode", 400
-    print("{0:b}".format(mode))
-    led_control("{0:b}".format(mode))
+    led_control(f"{mode:03b}")
     return "Ok", 200
 
 
