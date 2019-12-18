@@ -114,4 +114,4 @@ def receive_semaphore_status():
     return "Ok", 200
 
 
-app.run(port=5000, threaded=True, processes=4)
+app.run(port=5000, threaded=True)
