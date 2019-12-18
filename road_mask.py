@@ -4,9 +4,6 @@ from matplotlib import pyplot as plt
 import numpy as np
 from skimage.draw import polygon2mask
 
-from urllib.request import urlopen
-from time import time
-
 from flask import Flask
 from flask import request
 from flask import jsonify
@@ -100,15 +97,4 @@ def receive_semaphore_status():
     return "Ok", 200
 
 
-app.run(port=5000)
-
-
-# pimg = "885.jpg"
-# oimage = cv2.imread(pimg)
-# detector = CarDetector()
-# rs = detector.detect(oimage, show_result=False)
-# for i in rs:
-#     print(len(i))
-# print(rs)
-
-# main()
+app.run(port=5000, threaded=True, processes=4)

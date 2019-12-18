@@ -1,11 +1,3 @@
-# #!/usr/bin/python
-#
-# import sys
-# import mraa
-# import time
-# import os
-
-
 def led_control(led_status):
     """
     Given a string with len() == 3 and values 0-1
