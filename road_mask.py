@@ -86,6 +86,8 @@ app.logger.addHandler(handler)
 
 @app.route('/', methods=["POST"])
 def receive_image():
+    if request.method != "POST":
+        return "Forbidden", 403
     nparr = np.frombuffer(request.data, np.uint8)
     image = cv2.imdecode(nparr, cv2.IMREAD_COLOR)
     app.logger.info(f"Received image whose size is: {image.shape[1]}x"
@@ -97,6 +99,8 @@ def receive_image():
 
 @app.route("/data", methods=["POST"])
 def receive_semaphore_status():
+    if request.method != "POST":
+        return "Forbidden", 403
     status = request.get_json()
     if status is None:
         app.logger.error("Received no json")
