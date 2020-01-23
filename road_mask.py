@@ -1,11 +1,10 @@
 import cv2
-from matplotlib import pyplot as plt
-
 import numpy as np
-from skimage.draw import polygon2mask
+import logging
 
-from urllib.request import urlopen
-from time import time
+from logging.handlers import RotatingFileHandler
+from matplotlib import pyplot as plt
+from skimage.draw import polygon2mask
 
 from flask import Flask
 from flask import request
@@ -78,37 +77,41 @@ class CarDetector:
 
 app = Flask(__name__)
 detector = CarDetector()
+handler = RotatingFileHandler("/var/log/roadmask.log",
+                              maxBytes=10000,
+                              backupCount=5)
+handler.setLevel(logging.INFO)
+app.logger.addHandler(handler)
 
 
 @app.route('/', methods=["POST"])
 def receive_image():
+    if request.method != "POST":
+        return "Forbidden", 403
     nparr = np.frombuffer(request.data, np.uint8)
     image = cv2.imdecode(nparr, cv2.IMREAD_COLOR)
+    app.logger.info(f"Received image whose size is: {image.shape[1]}x"
+                    f"{image.shape[0]}")
     vehicles = [len(x) for x in detector.detect(image)]
+    app.logger.info(f"Detected vehicles: {vehicles}")
     return jsonify({"vehicles": vehicles}), 200
 
 
 @app.route("/data", methods=["POST"])
 def receive_semaphore_status():
+    if request.method != "POST":
+        return "Forbidden", 403
     status = request.get_json()
     if status is None:
+        app.logger.error("Received no json")
         return jsonify({"status": "error"}), 400
     mode = status.get("mode")
     if mode is None:
+        app.logger.error("No mode in received json")
         return "No mode", 400
-    led_control("{0:b}".format(mode))
+    app.logger.info(f"Received json: {mode}")
+    led_control(f"{mode:03b}")
     return "Ok", 200
 
 
-app.run(port=5000)
-
-
-# pimg = "885.jpg"
-# oimage = cv2.imread(pimg)
-# detector = CarDetector()
-# rs = detector.detect(oimage, show_result=False)
-# for i in rs:
-#     print(len(i))
-# print(rs)
-
-# main()
+app.run(port=5000, threaded=True)
