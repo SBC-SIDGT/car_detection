@@ -1,5 +1,5 @@
 flask
-opencv-python==3.4.3.18
+opencv-python==3.4.7.28
 numpy
 scikit-image
 matplotlib
